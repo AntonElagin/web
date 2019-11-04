@@ -1,21 +1,29 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import status
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 from .models import Image, Comment, Like
+from users.models import Creator
 from .serializers import ImageSerializer, CommentSerializer, LikeSerializer
 
 @login_required(login_url= '/auth/login/facebook')
 @api_view(['GET', 'POST'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 def images(request):
 
     if request.method == 'GET':
-        if 'search' in request.GET:
-            search = request.GET['search']
-            images = Image.objects.filter(caption__contains=search)
-        else:
-            images = Image.objects.all()
+        creator = Creator.objects.get(user=request.user)
+        if request.method == 'GET':
+            # if 'search' in request.GET:
+            #     search = request.GET['search']
+            #     images = Image.objects.filter(caption__contains=search)
+            # else:
+            images = Image.objects.all(creator=creator)
 
         # Paginator
         paginator = Paginator(images, 45)
