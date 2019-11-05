@@ -9,5 +9,5 @@ urlpatterns = [
     path('<int:image_pk>/comments/', views.comments),
     path('<int:image_pk>/comments/<int:comment_pk>/', views.comments_detail),
     path('<int:image_pk>/likes/', views.likes),
-    path('<int:pk>/unlikes/', views.likes),
+    path('<int:image_pk>/unlikes/', views.likes),
 ]
