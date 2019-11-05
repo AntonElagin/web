@@ -2,10 +2,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import status
 from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from social_django.models import UserSocialAuth
 from django.contrib.auth.models import User
 from .models import Image, Comment, Like
 from users.models import Creator
@@ -17,23 +15,17 @@ from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from users.views import CsrfExemptSessionAuthentication
 
 
-from django.http import HttpResponse
 
-
-
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 @authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def images(request):
 
-    user = User.objects.get(username=request.user.get_username())
-    # return HttpResponse(user.email)
+     if request.method == 'GET':
+        user = User.objects.get(username=request.user.get_username())
 
-    creator = Creator.objects.get_or_create(user=user,name=str(user.first_name+user.last_name))
-    # creator = Creator.objects.get(user__username=user)
-    # return HttpResponse(str(creator))
-    if request.method == 'GET':
+        creator = Creator.objects.get_or_create(user=user, name=str(user.first_name + user.last_name))
 
         images = Image.objects.filter(creator=creator[0])
 
@@ -55,7 +47,36 @@ def images(request):
                          'next': next_page,
                          'num_pages': paginator.num_pages})
 
+@api_view(['GET','POST'])
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def images_post(request):
+    user = User.objects.get(username=request.user.get_username())
+
+    creator = Creator.objects.get_or_create(user=user, name=str(user.first_name + user.last_name))
+    if request.method == 'GET':
+        images = Image.objects.filter(creator=creator)
+
+        # Paginator
+        paginator = Paginator(images, 20)
+
+        if 'page' in request.GET:
+            page_num = request.GET['page']
+        else:
+            page_num = 1
+        page = paginator.get_page(page_num)
+        previous_page = page.previous_page_number() if page.has_previous() else 1
+        next_page = page.next_page_number() if page.has_next() else 1
+
+        serializer = ImageSerializer(page.object_list, many=True)
+        return Response({'data': serializer.data,
+                         'page': page_num,
+                         'previous': previous_page,
+                         'next': next_page,
+                         'num_pages': paginator.num_pages})
+
     if request.method == 'POST':
+
         serializer = ImageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.creator_id = creator[0].id
