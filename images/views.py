@@ -103,8 +103,12 @@ def images_detail(request, pk):
 
 
 @api_view(['POST'])
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 def comments(request, image_pk):
+
     if request.method == 'POST':
+        creator = Creator.objects.get(user__username=request.user)
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.creator_id = creator.id
@@ -114,6 +118,8 @@ def comments(request, image_pk):
 
 
 @api_view(['DELETE'])
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 def comments_detail(request, image_pk, comment_pk):
     comment = Comment.objects.get(pk=comment_pk)
     if request.method == 'DELETE':
