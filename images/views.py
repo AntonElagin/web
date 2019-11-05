@@ -55,7 +55,7 @@ def images_post(request):
 
     creator = Creator.objects.get_or_create(user=user, name=str(user.first_name + user.last_name))
     if request.method == 'GET':
-        images = Image.objects.filter(creator=creator)
+        images = Image.objects.filter(creator=creator[0])
 
         # Paginator
         paginator = Paginator(images, 20)
