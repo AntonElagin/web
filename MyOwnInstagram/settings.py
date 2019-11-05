@@ -166,7 +166,8 @@ STATIC_URL = '/static/'
 # Facebook configuration
 SOCIAL_AUTH_FACEBOOK_KEY = '2333798976907567'
 SOCIAL_AUTH_FACEBOOK_SECRET = '8ab536630107f393f20c381ed0d01877'
-# SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'https://anton1202.pythonanywhere.com/users/images'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/users/images'
+
 
 # # Define SOCIAL_AUTH_FACEBOOK_SCOPE to get extra permissions from facebook. Email is not sent by default, to get it, you must request the email permission:
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']

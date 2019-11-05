@@ -13,10 +13,13 @@ class ImageSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ('message', 'creator')
+        fields = '__all__'
+        read_only_fields = ['id', 'creator']
+
 
 
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = '__all__'
+        read_only_fields = ['id', 'date']
