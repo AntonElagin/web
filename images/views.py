@@ -4,29 +4,42 @@ from rest_framework import status
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from social_django.models import UserSocialAuth
+from django.contrib.auth.models import User
 from .models import Image, Comment, Like
 from users.models import Creator
+from rest_framework_social_oauth2.authentication import SocialAuthentication
 from .serializers import ImageSerializer, CommentSerializer, LikeSerializer
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework_social_oauth2.authentication import SocialAuthentication
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication
+from users.views import CsrfExemptSessionAuthentication
 
-@login_required(login_url= '/auth/login/facebook')
+
+from django.http import HttpResponse
+
+
+
 @api_view(['GET', 'POST'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@permission_classes([AllowAny])
+@csrf_exempt
 def images(request):
 
+    user = User.objects.get(username=request.user.get_username())
+    # return HttpResponse(user.email)
+
+    creator = Creator.objects.get_or_create(user=user,name=str(user.first_name+user.last_name))
+    # creator = Creator.objects.get(user__username=user)
+    # return HttpResponse(str(creator))
     if request.method == 'GET':
-        creator = Creator.objects.get(user=request.user)
-        if request.method == 'GET':
-            # if 'search' in request.GET:
-            #     search = request.GET['search']
-            #     images = Image.objects.filter(caption__contains=search)
-            # else:
-            images = Image.objects.all(creator=creator)
+
+        images = Image.objects.filter(creator=creator[0])
 
         # Paginator
-        paginator = Paginator(images, 45)
+        paginator = Paginator(images, 20)
+
         if 'page' in request.GET:
             page_num = request.GET['page']
         else:
@@ -41,9 +54,11 @@ def images(request):
                          'previous': previous_page,
                          'next': next_page,
                          'num_pages': paginator.num_pages})
-    elif request.method == 'POST':
+
+    if request.method == 'POST':
         serializer = ImageSerializer(data=request.data)
         if serializer.is_valid():
+            serializer.creator_id = creator[0].id
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -71,6 +86,7 @@ def comments(request, image_pk):
     if request.method == 'POST':
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
+            serializer.creator_id = creator.id
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -85,6 +101,8 @@ def comments_detail(request, image_pk, comment_pk):
 
 
 @api_view(['GET', 'POST'])
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@permission_classes([AllowAny])
 def likes(request, image_pk):
     if request.method == 'GET':
         image = Image.objects.get(pk=image_pk)
@@ -100,6 +118,8 @@ def likes(request, image_pk):
 
 
 @api_view(['DELETE'])
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@permission_classes([AllowAny])
 def likes_detail(request, pk):
     like = Like.objects.get(pk=pk)
     if request.method == 'DELETE':

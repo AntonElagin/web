@@ -5,7 +5,11 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Creator, Follow
 from .serializers import CreatorSerializer
+from rest_framework.authentication import SessionAuthentication
 
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return None
 
 @api_view(['GET'])
 # Поиск по username
