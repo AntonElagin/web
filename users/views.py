@@ -50,9 +50,10 @@ def users_detail(request, username):
         return Response(serializer.data)
 
 
+
+@api_view(['POST'])
 @authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
 @permission_classes([AllowAny])
-@api_view(['POST'])
 # Подписка
 def follow(request, pk):
     if request.method == 'POST':
@@ -75,8 +76,7 @@ def followers(request, username):
         return Response(followers_list)
 
 
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
-@permission_classes([AllowAny])
+
 @api_view(['GET'])
 def following(request, username):
 
@@ -90,9 +90,10 @@ def following(request, username):
         return Response(following_list)
 
 
+
+@api_view(['DELETE'])
 @authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
 @permission_classes([AllowAny])
-@api_view(['DELETE'])
 # Отписка
 def unfollow(request, pk):
     idol = get_object_or_404(Creator, pk=pk)
