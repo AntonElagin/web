@@ -1,15 +1,31 @@
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Creator, Follow
 from .serializers import CreatorSerializer
 from rest_framework.authentication import SessionAuthentication
+from rest_framework_social_oauth2.authentication import SocialAuthentication
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication
+
+from django.http import HttpResponse
+
+
+
+
+
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return None
+
+
+@api_view(['GET'])
+def user(request):
+    pass
+
 
 @api_view(['GET'])
 # Поиск по username
@@ -34,7 +50,8 @@ def users_detail(request, username):
         return Response(serializer.data)
 
 
-@login_required()
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
+@permission_classes([AllowAny])
 @api_view(['POST'])
 # Подписка
 def follow(request, pk):
@@ -43,7 +60,8 @@ def follow(request, pk):
         Follow.objects.create(author=idol, follower=request.user)
         return Response(status=status.HTTP_201_CREATED)
 
-@login_required()
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
+@permission_classes([AllowAny])
 @api_view(['GET'])
 def followers(request, username):
     if request.method == 'GET':
@@ -56,9 +74,11 @@ def followers(request, username):
         return Response(followers_list)
 
 
-@login_required()
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
+@permission_classes([AllowAny])
 @api_view(['GET'])
 def following(request, username):
+
     if request.method == 'GET':
         user = Creator.objects.get(user__username=username)
         follows = Follow.objects.filter(follower=user)
@@ -68,14 +88,15 @@ def following(request, username):
             following_list.append(serializer.data)
         return Response(following_list)
 
-@login_required()
-@api_view(['POST'])
-# @api_view(['DELETE'])
+
+@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
+@permission_classes([AllowAny])
+@api_view(['DELETE'])
 # Отписка
 def unfollow(request, pk):
     idol = get_object_or_404(Creator, pk=pk)
     follow_obj = Follow.objects.get(author=idol, follower=request.user)
-    if request.method == 'POST':#'DELETE':
+    if request.method == 'DELETE':
         follow_obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
