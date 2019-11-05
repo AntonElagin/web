@@ -57,7 +57,8 @@ def users_detail(request, username):
 def follow(request, pk):
     if request.method == 'POST':
         idol = get_object_or_404(Creator, pk=pk)
-        Follow.objects.create(author=idol, follower=request.user)
+        follower = Creator.objects.get(user__username=request.user)
+        Follow.objects.create(author=idol, follower=follower)
         return Response(status=status.HTTP_201_CREATED)
 
 @authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
@@ -95,7 +96,8 @@ def following(request, username):
 # Отписка
 def unfollow(request, pk):
     idol = get_object_or_404(Creator, pk=pk)
-    follow_obj = Follow.objects.get(author=idol, follower=request.user)
+    follower = Creator.objects.get(user__username=request.user)
+    follow_obj = Follow.objects.get(author=idol, follower=follower)
     if request.method == 'DELETE':
         follow_obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
