@@ -7,7 +7,7 @@ urlpatterns = [
     path('images/', include('images.urls')),
     path('users/', include('users.urls')),
     path('auth/', include('rest_framework_social_oauth2.urls'))
-    # path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
