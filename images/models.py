@@ -3,10 +3,7 @@ from users.models import Creator
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
+    name = models.CharField(max_length=255)
 
     class Meta:
         verbose_name = 'Tag'
@@ -15,13 +12,10 @@ class Tag(models.Model):
 
 class Image(models.Model):
     file = models.ImageField(verbose_name='File')
-    location = models.CharField(max_length=140, verbose_name='Location')
+    location = models.CharField(max_length=100, verbose_name='Location')
     caption = models.TextField(verbose_name='Caption')
     creator = models.ForeignKey(Creator, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
-
-    def __str__(self):
-        return 'Image #{}'.format(self.pk)
 
     class Meta:
         verbose_name = 'Image'
@@ -33,9 +27,6 @@ class Comment(models.Model):
     creator = models.ForeignKey(Creator, on_delete=models.SET_NULL, null=True)
     image = models.ForeignKey(Image, on_delete=models.CASCADE, null=True)
 
-    def __str__(self):
-        return 'Comment #{}'.format(self.pk)
-
     class Meta:
         verbose_name = 'Comment'
         verbose_name_plural = 'Comments'
@@ -45,9 +36,6 @@ class Like(models.Model):
     user = models.ForeignKey(Creator, on_delete=models.SET_NULL, null=True)
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return 'Like #{}'.format(self.pk)
 
     class Meta:
         verbose_name = 'Like'
