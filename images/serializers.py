@@ -12,7 +12,9 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['id', 'creator']
 
+
 class ImageSerializer(serializers.ModelSerializer):
+    comment = CommentSerializer(Comment.objects.filter(image__id=id))
     class Meta:
         model = Image
         fields = ('file', 'location', 'caption', 'creator',)
