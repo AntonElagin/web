@@ -15,7 +15,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('file', 'location', 'caption', 'creator', 'comments')
+        fields = ('file', 'location', 'caption', 'creator',)
         read_only_fields = ['creator','id']
 
 
