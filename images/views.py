@@ -8,21 +8,25 @@ from django.contrib.auth.models import User
 from .models import Image, Comment, Like
 from users.models import Creator
 from .serializers import ImageSerializer, CommentSerializer, LikeSerializer
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework_social_oauth2.authentication import SocialAuthentication
 from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from users.views import CsrfExemptSessionAuthentication
+from django.shortcuts import get_object_or_404, get_list_or_404
 
 
 @api_view(['GET'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@authentication_classes(
+    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def images(request):
-
-     if request.method == 'GET':
-        user = User.objects.get(username=request.user.get_username())
-        creator = Creator.objects.get_or_create(user=user, name=str(user.first_name + user.last_name))
-        images = Image.objects.filter(creator=creator[0])
+    if request.method == 'GET':
+        creator = get_object_or_404(Creator, id=request.user.id)
+        # creator = Creator.objects.get(id=request.user.id)
+        images = []
+        try:
+            images = Image.objects.filter(creator=creator)
+        except:
+            pass
 
         # Paginator
         paginator = Paginator(images, 20)
@@ -43,15 +47,18 @@ def images(request):
 
 
 @api_view(['GET', 'POST'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@authentication_classes(
+    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def images_post(request):
-    user = User.objects.get(username=request.user.get_username())
-    creator = Creator.objects.get_or_create(user=user, name=str(user.first_name + user.last_name))
-
+    creator = get_object_or_404(Creator, id=request.user.id)
+    # creator = Creator.objects.get(id=request.user.id)
     if request.method == 'GET':
-
-        images = Image.objects.filter(creator=creator[0])
+        images = []
+        try:
+            images = Image.objects.filter(creator=creator)
+        except:
+            pass
         # Paginator
         paginator = Paginator(images, 20)
 
@@ -74,17 +81,19 @@ def images_post(request):
         serializer = ImageSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.creator_id = creator[0].id
+            serializer.creator_id = creator.id
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@authentication_classes(
+    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def images_detail(request, image_pk):
-    image = Image.objects.get(pk=image_pk)
+    image = get_object_or_404(Image, id=image_pk)
+    # image = Image.objects.get(pk=image_pk)
     if request.method == 'GET':
         serializer = ImageSerializer(image)
         return Response(serializer.data)
@@ -100,12 +109,13 @@ def images_detail(request, image_pk):
 
 
 @api_view(['POST'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@authentication_classes(
+    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def comments(request, image_pk):
-
     if request.method == 'POST':
-        creator = Creator.objects.get(user__username=request.user)
+        creator = get_object_or_404(Creator, id=request.user.id)
+        # creator = Creator.objects.get(id=request.user.id)
         serializer = CommentSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -117,21 +127,25 @@ def comments(request, image_pk):
 
 
 @api_view(['DELETE'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@authentication_classes(
+    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def comments_detail(request, image_pk, comment_pk):
-    comment = Comment.objects.get(pk=comment_pk)
+    comment = get_object_or_404(Comment, id = comment_pk)
+    # comment = Comment.objects.get(pk=comment_pk)
     if request.method == 'DELETE':
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET', 'POST'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@authentication_classes(
+    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([AllowAny])
 def likes(request, image_pk):
     if request.method == 'GET':
-        image = Image.objects.get(pk=image_pk)
+        image = get_object_or_404(Image, id=image_pk)
+        # image = Image.objects.get(pk=image_pk)
         likes = image.like_set
         serializer = LikeSerializer(likes, many=True)
         return Response(serializer.data)
@@ -144,10 +158,12 @@ def likes(request, image_pk):
 
 
 @api_view(['DELETE'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+@authentication_classes(
+    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([AllowAny])
 def likes_detail(request, pk):
-    like = Like.objects.get(pk=pk)
+    like = get_object_or_404(Like, id=pk)
+    # like = Like.objects.get(pk=pk)
 
     if request.method == 'DELETE':
         like.delete()

@@ -1,0 +1,5 @@
+[client]
+database = Insta
+user = anton
+password = 12A02El99
+default-character-set = utf8

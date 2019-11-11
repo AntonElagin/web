@@ -24,7 +24,7 @@ class Image(models.Model):
 
 class Comment(models.Model):
     message = models.TextField(verbose_name='Message')
-    creator = models.ForeignKey(Creator, on_delete=models.SET_NULL, null=True)
+    creator = models.ForeignKey(Creator, on_delete=models.CASCADE, null=True)
     image = models.ForeignKey(Image, on_delete=models.CASCADE, null=True)
 
     class Meta:
@@ -33,7 +33,7 @@ class Comment(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey(Creator, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(Creator, on_delete=models.CASCADE, null=True)
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
 

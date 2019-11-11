@@ -2,7 +2,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import status
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from .models import Creator, Follow
 from .serializers import CreatorSerializer
 from rest_framework.authentication import SessionAuthentication
@@ -27,7 +27,8 @@ def users_search(request):
     if request.method == 'GET':
         if 'search' in request.GET:
             search = request.GET['search']
-            search_users = Creator.objects.filter(user__username=search)
+            # search_users = Creator.objects.filter(username=search)
+            search_users =get_list_or_404(Creator, username=search)
         else:
             search_users = Creator.objects.all()
         serializer = CreatorSerializer(search_users, many=True)
@@ -39,7 +40,7 @@ def users_search(request):
 def users_details(request, username):
 
     if request.method == 'GET':
-        user = get_object_or_404(Creator, user__username=username)
+        user = get_object_or_404(Creator, username=username)
         serializer = CreatorSerializer(user)
         return Response(serializer.data)
 
@@ -51,7 +52,8 @@ def users_details(request, username):
 def follow(request, user_pk):
     if request.method == 'POST':
         idol = get_object_or_404(Creator, pk=user_pk)
-        follower = Creator.objects.get(user__username=request.user)
+        follower = get_object_or_404(Creator, id=request.user.id)
+        # follower = Creator.objects.get(username=request.user) # TODO : затестить
         Follow.objects.create(author=idol, follower=follower)
         return Response(status=status.HTTP_201_CREATED)
 
@@ -61,9 +63,12 @@ def follow(request, user_pk):
 @authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
 @permission_classes([AllowAny])
 def followers(request, username):
+
     if request.method == 'GET':
-        idol = Creator.objects.get(user__username=username)
-        follows = Follow.objects.filter(author=idol)
+        idol = get_object_or_404(Creator, username=username)
+        # idol = Creator.objects.get(sername=username)
+        follows = get_list_or_404(Follow, author=idol)
+        # follows = Follow.objects.filter(author=idol)
         followers_list = []
         for follow in follows:
             serializer = CreatorSerializer(follow.follower)
@@ -76,8 +81,10 @@ def followers(request, username):
 def following(request, username):
 
     if request.method == 'GET':
-        user = Creator.objects.get(user__username=username)
-        follows = Follow.objects.filter(follower=user)
+        user = get_object_or_404(Creator, username=username)
+        # user = Creator.objects.get(username=username)
+        follows = get_list_or_404(Follow,follower=user)
+        # follows = Follow.objects.filter(follower=user)
         following_list = []
         for follow in follows:
             serializer = CreatorSerializer(follow.author)
@@ -91,9 +98,11 @@ def following(request, username):
 @permission_classes([AllowAny])
 def unfollow(request, user_pk):
 
-    idol = get_object_or_404(Creator, pk=user_pk)
-    follower = Creator.objects.get(user__username=request.user)
-    follow_obj = Follow.objects.get(author=idol, follower=follower)
+    idol = get_object_or_404(Creator, id=user_pk)
+    follower = get_object_or_404(Creator, id=request.user.id)
+    # follower = Creator.objects.get(username=request.user)
+    # follow_obj = Follow.objects.get(author=idol, follower=follower)
+    follow_obj = get_object_or_404(Follow, author=idol, follower=follower)
 
     if request.method == 'DELETE':
         follow_obj.delete()

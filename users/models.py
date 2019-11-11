@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import validate_slug
 
 
 class Creator(models.Model):
@@ -7,7 +8,9 @@ class Creator(models.Model):
     name = models.CharField(max_length=255, verbose_name='Name of User')
     bio = models.TextField(null=True, blank=True, verbose_name='Bio')
     website = models.CharField(max_length=255, null=True, blank=True, verbose_name='Website')
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=50, null=False)
+    email = models.EmailField(max_length=255, null=False, verbose_name='Email', unique=True)
+    password = models.CharField(max_length=100, null=False, verbose_name='Password')
 
     def __str__(self):
         return self.name

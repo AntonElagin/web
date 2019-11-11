@@ -23,7 +23,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-
+AUTH_USER_MODEL = 'users.Creator'
 
 AUTHENTICATION_BACKENDS = (
 
@@ -112,8 +112,10 @@ WSGI_APPLICATION = 'MyOwnInstagram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'read_default_file': os.path.join(BASE_DIR, "mysql.cnf"),
+        },
     }
 }
 
@@ -154,13 +156,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+
 
 # default static files settings for PythonAnywhere.
 # see https://help.pythonanywhere.com/pages/DjangoStaticFiles for more info
-MEDIA_ROOT = u'/home/anton1202/MyOwnInstagram/media'
+MEDIA_ROOT = os.path.join(BASE_DIR, "MyOwnInstagram/media")
 MEDIA_URL = '/media/'
-STATIC_ROOT = u'/home/anton1202/MyOwnInstagram/static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'MyOwnInstagram/static')
 STATIC_URL = '/static/'
 
 # Facebook configuration
