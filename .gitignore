@@ -4,12 +4,12 @@
 
 # Media files
 media/*
-users/migrations/*
-images/migrations/*
+/users/migrations
+/images/migrations
 db.sqlite3
-__pycache__/*
-users/__pycache__/*
-images/__pycache__/*
+__pycache__
+/users/__pycache__
+/images/__pycache__
 MyOwnInstagram/__pycache__/*
 env/*
 /env/
