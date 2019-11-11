@@ -3,7 +3,11 @@
 .idea/
 
 # Media files
-media/
-users/migrations
-images/migrations
+media/*
+users/migrations/*
+images/migrations/*
 db.sqlite3
+__pycache__/*
+users/__pycache__/*
+images/__pycache__/*
+MyOwnInstagram/__pycache__/*
