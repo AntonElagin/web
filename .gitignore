@@ -11,3 +11,4 @@ __pycache__/*
 users/__pycache__/*
 images/__pycache__/*
 MyOwnInstagram/__pycache__/*
+env/*
