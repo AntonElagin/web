@@ -4,8 +4,7 @@
 
 # Media files
 media/*
-/users/migrations
-/images/migrations
+
 db.sqlite3
 __pycache__
 /users/__pycache__
@@ -15,3 +14,5 @@ env/*
 /env/
 
 /media/
+
+mysql.cnf

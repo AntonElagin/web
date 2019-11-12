@@ -6,7 +6,7 @@
 3) (доделать) Если я буду заливать вместо png (file = models.ImageField(verbose_name='File') ), большой файл, например txt, как ты будешь с этим бороться? 
 4) (доделать) Если напишешь 2-3 теста на каждый модуль будет очень круто, для понимания этого момента.
 5) (ok) Давай сделаем проверку тегов на уникальность на уровне базы.
-6) (доделать) Почему локация в чарфилде?
-7) (доделать) Почему user = models.OneToOneField(User, on_delete=models.CASCADE) делай через абстрактоного юзера
+6) (ок, но не работает) Почему локация в чарфилде?
+7) (ок(нет)) Почему user = models.OneToOneField(User, on_delete=models.CASCADE) делай через абстрактоного юзера
 8) (ок) Не хардкодь! MEDIA_ROOT = u'/home/anton1202/MyOwnInstagram/media' MEDIA_URL = '/media/' STATIC_ROOT = u'/home/anton1202/MyOwnInstagram/static' STATIC_URL = '/static/‘ У меня это работать не будет, и на прод серверах! Плохо!
-9) (не уверен!) Уверен? @authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfE
+9) (ок) Уверен? @authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfE
