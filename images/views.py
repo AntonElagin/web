@@ -9,14 +9,14 @@ from .models import Image, Comment, Like
 from users.models import Creator
 from .serializers import ImageSerializer, CommentSerializer, LikeSerializer
 from rest_framework_social_oauth2.authentication import SocialAuthentication
-from oauth2_provider.contrib.rest_framework import OAuth2Authentication
+# from oauth2_provider.contrib.rest_framework import A
 from users.views import CsrfExemptSessionAuthentication
 from django.shortcuts import get_object_or_404, get_list_or_404
 
 
 @api_view(['GET'])
 @authentication_classes(
-    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+    [CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def images(request):
     if request.method == 'GET':
@@ -48,7 +48,7 @@ def images(request):
 
 @api_view(['GET', 'POST'])
 @authentication_classes(
-    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+    [CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def images_post(request):
     creator = get_object_or_404(Creator, id=request.user.id)
@@ -89,7 +89,7 @@ def images_post(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @authentication_classes(
-    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+    [CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def images_detail(request, image_pk):
     image = get_object_or_404(Image, id=image_pk)
@@ -110,7 +110,7 @@ def images_detail(request, image_pk):
 
 @api_view(['POST'])
 @authentication_classes(
-    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+    [CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def comments(request, image_pk):
     if request.method == 'POST':
@@ -128,7 +128,7 @@ def comments(request, image_pk):
 
 @api_view(['DELETE'])
 @authentication_classes(
-    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+    [ BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def comments_detail(request, image_pk, comment_pk):
     comment = get_object_or_404(Comment, id = comment_pk)
@@ -140,7 +140,7 @@ def comments_detail(request, image_pk, comment_pk):
 
 @api_view(['GET', 'POST'])
 @authentication_classes(
-    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+    [CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([AllowAny])
 def likes(request, image_pk):
     if request.method == 'GET':
@@ -159,7 +159,7 @@ def likes(request, image_pk):
 
 @api_view(['DELETE'])
 @authentication_classes(
-    [OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication, BasicAuthentication])
+    [CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([AllowAny])
 def likes_detail(request, pk):
     like = get_object_or_404(Like, id=pk)

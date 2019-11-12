@@ -47,7 +47,7 @@ def users_details(request, username):
 
 # Подписка
 @api_view(['POST'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
+@authentication_classes([CsrfExemptSessionAuthentication])
 @permission_classes([AllowAny])
 def follow(request, user_pk):
     if request.method == 'POST':
@@ -60,7 +60,7 @@ def follow(request, user_pk):
 
 # Подписчики
 @api_view(['GET'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
+@authentication_classes([CsrfExemptSessionAuthentication])
 @permission_classes([AllowAny])
 def followers(request, username):
 
@@ -94,7 +94,7 @@ def following(request, username):
 
 # Отписка
 @api_view(['DELETE'])
-@authentication_classes([OAuth2Authentication, SocialAuthentication, CsrfExemptSessionAuthentication])
+@authentication_classes([CsrfExemptSessionAuthentication])
 @permission_classes([AllowAny])
 def unfollow(request, user_pk):
 
